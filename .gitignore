@@ -1,0 +1,21 @@
+node_modules
+npm-debug.log
+dist/
+
+# Editor junk
+*.sublime-project
+*.sublime-workspace
+*.swp
+.idea/
+*.iml
+*.tmp
+
+# Include vscode debugger config
+!.vscode/launch.json
+
+# Jest coverage
+coverage/
+tmp/
+*.d.ts
+
+/.vs
