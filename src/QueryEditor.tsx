@@ -1,10 +1,10 @@
-import defaults from "lodash/defaults";
+import defaults from 'lodash/defaults';
 
-import React, { PureComponent, ChangeEvent } from "react";
-import { QueryEditorProps } from "@grafana/data";
-import { DataSource } from "./DataSource";
-import { LiveQuery, LiveDataSourceOptions, defaultQuery } from "./types";
-import { LegacyForms } from "@grafana/ui";
+import React, { PureComponent, ChangeEvent } from 'react';
+import { QueryEditorProps } from '@grafana/data';
+import { DataSource } from './DataSource';
+import { LiveQuery, LiveDataSourceOptions, defaultQuery } from './types';
+import { LegacyForms } from '@grafana/ui';
 
 type Props = QueryEditorProps<DataSource, LiveQuery, LiveDataSourceOptions>;
 
@@ -40,7 +40,7 @@ export class QueryEditor extends PureComponent<Props, State> {
         ></LegacyForms.FormField>
         <LegacyForms.FormField
           labelWidth={8}
-          value={stream || ""}
+          value={stream || ''}
           onChange={this.onStreamChange}
           label="Query Path"
           tooltip="from the base url"

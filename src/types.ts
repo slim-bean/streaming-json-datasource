@@ -1,10 +1,10 @@
-import { DataQuery, DataSourceJsonData } from "@grafana/data";
+import { DataQuery, DataSourceJsonData } from '@grafana/data';
 
 export enum LiveQueryType {
-  OpenStreams = "openStreamInfo",
-  AvaliableStreams = "avaliableStreams",
-  Telegraph = "telegraph",
-  JSON = "json"
+  OpenStreams = 'openStreamInfo',
+  AvaliableStreams = 'avaliableStreams',
+  Telegraph = 'telegraph',
+  JSON = 'json',
 }
 
 export interface LiveQuery extends DataQuery {
@@ -14,7 +14,7 @@ export interface LiveQuery extends DataQuery {
 }
 
 export const defaultQuery: Partial<LiveQuery> = {
-  buffer: 2000
+  buffer: 2000,
 };
 
 /**

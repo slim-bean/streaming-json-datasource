@@ -1,4 +1,4 @@
-import { merge, Observable, Subject, of } from "rxjs";
+import { merge, Observable, Subject, of } from 'rxjs';
 
 import {
   DataQueryRequest,
@@ -9,23 +9,18 @@ import {
   LoadingState,
   ArrayDataFrame,
   FieldType,
-  CircularDataFrame
-} from "@grafana/data";
+  CircularDataFrame,
+} from '@grafana/data';
 
-import { LiveQuery, LiveDataSourceOptions } from "./types";
+import { LiveQuery, LiveDataSourceOptions } from './types';
 
-export class DataSource extends DataSourceApi<
-  LiveQuery,
-  LiveDataSourceOptions
-> {
+export class DataSource extends DataSourceApi<LiveQuery, LiveDataSourceOptions> {
   private url: string;
   private streams: KeyValue<StreamHandler> = {};
 
-  constructor(
-    instanceSettings: DataSourceInstanceSettings<LiveDataSourceOptions>
-  ) {
+  constructor(instanceSettings: DataSourceInstanceSettings<LiveDataSourceOptions>) {
     super(instanceSettings);
-    this.url = instanceSettings.url || "";
+    this.url = instanceSettings.url || '';
   }
 
   query(options: DataQueryRequest<LiveQuery>): Observable<DataQueryResponse> {
@@ -48,35 +43,31 @@ export class DataSource extends DataSourceApi<
   }
 
   getOpenStreamInfo(): Observable<DataQueryResponse> {
-    const info: StreamInfo[] = Object.values(this.streams).map(s =>
-      s.getInfo()
-    );
+    const info: StreamInfo[] = Object.values(this.streams).map(s => s.getInfo());
     const frame = new ArrayDataFrame(info);
-    frame.setFieldType("opened", FieldType.time);
-    frame.setFieldType("lastMessage", FieldType.time);
+    frame.setFieldType('opened', FieldType.time);
+    frame.setFieldType('lastMessage', FieldType.time);
     return of({
       state: LoadingState.Done,
-      data: [frame]
+      data: [frame],
     });
   }
 
   getAvaliableStreams(): Observable<DataQueryResponse> {
-    const info: StreamInfo[] = Object.values(this.streams).map(s =>
-      s.getInfo()
-    );
+    const info: StreamInfo[] = Object.values(this.streams).map(s => s.getInfo());
     const frame = new ArrayDataFrame(info);
-    frame.setFieldType("opened", FieldType.time);
-    frame.setFieldType("lastMessage", FieldType.time);
+    frame.setFieldType('opened', FieldType.time);
+    frame.setFieldType('lastMessage', FieldType.time);
     return of({
       state: LoadingState.Done,
-      data: [frame]
+      data: [frame],
     });
   }
 
   async testDatasource() {
     return {
-      status: "success",
-      message: "Success"
+      status: 'success',
+      message: 'Success',
     };
   }
 }
@@ -101,11 +92,11 @@ export class StreamHandler {
 
   constructor(private url: string, private query: LiveQuery) {
     this.info = {
-      stream: query.stream || "stream",
+      stream: query.stream || 'stream',
       opened: Date.now(),
       lastMessage: (undefined as unknown) as number,
       chunks: 0,
-      observers: 0
+      observers: 0,
     };
     this.isOpen = false;
   }
@@ -113,7 +104,7 @@ export class StreamHandler {
   getInfo() {
     return {
       ...this.info,
-      observers: this.subject.observers.length
+      observers: this.subject.observers.length,
     };
   }
 
@@ -131,18 +122,18 @@ export class StreamHandler {
     let df = this.data[name];
     if (!df) {
       df = new CircularDataFrame({
-        append: "tail",
-        capacity: this.query.buffer
+        append: 'tail',
+        capacity: this.query.buffer,
       });
       df.name = name;
-      df.addField({ name: "timestamp", type: FieldType.time }, 0);
+      df.addField({ name: 'timestamp', type: FieldType.time }, 0);
       this.data[name] = df;
     }
 
     const row = {
       timestamp: msg.timestamp * 1000,
       ...msg.fields,
-      ...msg.tags
+      ...msg.tags,
     };
 
     df.add(row, true);
@@ -167,13 +158,13 @@ export class StreamHandler {
     this.subject.next({
       data: Object.values(this.data),
       key: this.info.stream,
-      state: value.done ? LoadingState.Done : LoadingState.Streaming
+      state: value.done ? LoadingState.Done : LoadingState.Streaming,
     });
 
     if (value.done) {
       this.isOpen = false;
       this.reader = undefined;
-      console.log("Finished stream");
+      console.log('Finished stream');
       this.subject.complete(); // necessary?
       return;
     }
@@ -182,7 +173,7 @@ export class StreamHandler {
   };
 
   handleMessage(msg: any) {
-    console.log("MSG", msg);
+    console.log('MSG', msg);
   }
 
   close() {
