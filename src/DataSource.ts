@@ -1,4 +1,5 @@
 import { merge, Observable, Subject, of } from 'rxjs';
+import { getTemplateSrv } from '@grafana/runtime';
 
 import {
   DataQueryRequest,
@@ -17,10 +18,12 @@ import { LiveQuery, LiveDataSourceOptions } from './types';
 export class DataSource extends DataSourceApi<LiveQuery, LiveDataSourceOptions> {
   private url: string;
   private streams: KeyValue<StreamHandler> = {};
+  templateSrv: any;
 
   constructor(instanceSettings: DataSourceInstanceSettings<LiveDataSourceOptions>) {
     super(instanceSettings);
     this.url = instanceSettings.url || '';
+    this.templateSrv = getTemplateSrv();
   }
 
   query(options: DataQueryRequest<LiveQuery>): Observable<DataQueryResponse> {
@@ -28,7 +31,7 @@ export class DataSource extends DataSourceApi<LiveQuery, LiveDataSourceOptions> 
 
     // Return a constant for each query.
     for (const target of options.targets) {
-      const url = this.url; // maybe plus stream
+      const url = this.url + this.templateSrv.replace(target.stream) || ''; // maybe plus stream
       let stream = this.streams[url];
       if (!stream) {
         stream = this.streams[url] = new StreamHandler(url, target);
@@ -115,6 +118,7 @@ export class StreamHandler {
         this.reader.read().then(this.processChunk);
       }
     });
+    this.isOpen = true;
   }
 
   processMsg(msg: any) {
@@ -127,13 +131,13 @@ export class StreamHandler {
       });
       df.name = name;
       df.addField({ name: 'timestamp', type: FieldType.time }, 0);
+      df.addField({ name: 'value', type: FieldType.number });
       this.data[name] = df;
     }
 
     const row = {
-      timestamp: msg.timestamp * 1000,
-      ...msg.fields,
-      ...msg.tags,
+      timestamp: msg.ts,
+      value: msg.val,
     };
 
     df.add(row, true);
